@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Cours"
+rootProject.name = "VK"
 include(":app")
