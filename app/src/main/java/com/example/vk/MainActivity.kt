@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun FirstScreen() {
     var inputText by remember { mutableStateOf("") }
-    // Состояние для хранения номера телефона
     var phoneNumber by remember { mutableStateOf("") }
     val context = LocalContext.current
 
@@ -48,11 +47,11 @@ fun FirstScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Поле ввода текста для передачи на второй экран
+
         OutlinedTextField(
             value = inputText,
             onValueChange = { inputText = it },
-            label = { Text("Введите текст для 2-го экрана") },
+            label = { Text("Введите текст") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -68,13 +67,28 @@ fun FirstScreen() {
             Text("Открыть второй экран")
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Системный Intent
+        Button(onClick = {
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, inputText)
+            }
+
+            val chooser = Intent.createChooser(shareIntent, "Поделиться через:")
+            context.startActivity(chooser)
+        }) {
+            Text("Поделиться текстом")
+        }
+
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Поле ввода для номера телефона
         OutlinedTextField(
             value = phoneNumber,
             onValueChange = { phoneNumber = it },
             label = { Text("Введите номер телефона") },
-            // Открывает цифровую клавиатуру для удобства ввода
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth()
         )
