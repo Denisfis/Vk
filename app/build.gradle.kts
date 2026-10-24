@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.cours"
+    namespace = "com.example.vk"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.cours"
+        applicationId = "com.example.vk"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
@@ -44,6 +44,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Cours</string>
+    <string name="app_name">VK</string>
+    <string name="app_list_title">Приложения</string>
+    <string name="app_list_toolbar_snackbar">Это каталог приложений VK</string>
 </resources>

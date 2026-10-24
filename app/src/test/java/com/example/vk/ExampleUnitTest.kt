@@ -1,4 +1,4 @@
-package com.example.cours
+package com.example.vk
 
 import org.junit.Test
 
