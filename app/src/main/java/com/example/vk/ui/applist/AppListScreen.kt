@@ -1,6 +1,7 @@
 package com.example.vk.ui.applist
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,15 +16,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,25 +42,69 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.vk.R
-import com.example.vk.data.applist.AppListApi
+import com.example.vk.data.applist.sampleApps
 import com.example.vk.domain.applist.AppSummary
 import com.example.vk.ui.theme.VKTheme
 
 @Composable
-fun AppListScreen(apps: List<AppSummary>, modifier: Modifier = Modifier) {
+fun AppListScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AppListViewModel = viewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage = stringResource(R.string.app_list_toolbar_snackbar)
+
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                AppListEvent.ShowToolbarSnackbar -> snackbarHostState.showSnackbar(snackbarMessage)
+            }
+        }
+    }
+
+    AppListContent(
+        state = state,
+        snackbarHostState = snackbarHostState,
+        onToolbarClick = viewModel::onToolbarClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun AppListContent(
+    state: AppListState,
+    snackbarHostState: SnackbarHostState,
+    onToolbarClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { AppListToolbar() },
+        topBar = { AppListToolbar(onClick = onToolbarClick) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
-        AppList(apps = apps, contentPadding = innerPadding)
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            AppList(apps = state.apps, contentPadding = innerPadding)
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AppListToolbar() {
+private fun AppListToolbar(onClick: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_list_title)) },
         navigationIcon = { CurrentAppIcon(modifier = Modifier.padding(start = 12.dp, end = 4.dp)) },
@@ -61,6 +112,7 @@ private fun AppListToolbar() {
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
         ),
+        modifier = Modifier.clickable(onClick = onClick),
     )
 }
 
@@ -169,6 +221,10 @@ private fun CategoryLabel(title: String) {
 @Composable
 private fun AppListScreenPreview() {
     VKTheme {
-        AppListScreen(apps = AppListApi().getApps())
+        AppListContent(
+            state = AppListState(apps = sampleApps, isLoading = false),
+            snackbarHostState = remember { SnackbarHostState() },
+            onToolbarClick = {},
+        )
     }
 }
