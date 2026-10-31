@@ -1,4 +1,4 @@
-package com.example.vk.ui.applist
+package com.example.vk.presentation.applist
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -46,14 +46,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.vk.R
-import com.example.vk.data.applist.sampleApps
 import com.example.vk.domain.applist.AppSummary
-import com.example.vk.ui.theme.VKTheme
+import com.example.vk.domain.applist.Category
+import com.example.vk.presentation.theme.VKTheme
 
 @Composable
 fun AppListScreen(
     modifier: Modifier = Modifier,
-    viewModel: AppListViewModel = viewModel(),
+    viewModel: AppListViewModel = viewModel(factory = AppListViewModel.Factory),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -222,9 +222,26 @@ private fun CategoryLabel(title: String) {
 private fun AppListScreenPreview() {
     VKTheme {
         AppListContent(
-            state = AppListState(apps = sampleApps, isLoading = false),
+            state = AppListState(apps = previewApps, isLoading = false),
             snackbarHostState = remember { SnackbarHostState() },
             onToolbarClick = {},
         )
     }
 }
+
+private val previewApps = listOf(
+    AppSummary(
+        id = "1",
+        name = "Гильдия Героев: Экшен ММО РПГ",
+        description = "Легендарный рейд героев в фэнтези РПГ",
+        category = Category.GAME,
+        iconUrl = "",
+    ),
+    AppSummary(
+        id = "2",
+        name = "QuickNote",
+        description = "Быстрые заметки и списки дел",
+        category = Category.PRODUCTIVITY,
+        iconUrl = "",
+    ),
+)
