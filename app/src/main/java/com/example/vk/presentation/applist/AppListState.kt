@@ -1,4 +1,4 @@
-package com.example.vk.ui.applist
+package com.example.vk.presentation.applist
 
 import com.example.vk.domain.applist.AppSummary
 

@@ -1,4 +1,4 @@
-package com.example.vk.ui.applist
+package com.example.vk.presentation.applist
 
 /** Одноразовые события экрана: обрабатываются один раз и не повторяются после поворота. */
 sealed interface AppListEvent {
