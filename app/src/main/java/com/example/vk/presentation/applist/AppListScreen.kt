@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -39,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,6 +74,7 @@ fun AppListScreen(
         state = state,
         snackbarHostState = snackbarHostState,
         onToolbarClick = viewModel::onToolbarClick,
+        onRetryClick = viewModel::onRetryClick,
         modifier = modifier,
     )
 }
@@ -80,6 +84,7 @@ private fun AppListContent(
     state: AppListState,
     snackbarHostState: SnackbarHostState,
     onToolbarClick: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -87,17 +92,36 @@ private fun AppListContent(
         topBar = { AppListToolbar(onClick = onToolbarClick) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center,
-            ) {
+        val centeredModifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+        when {
+            state.isLoading -> Box(modifier = centeredModifier, contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
-        } else {
-            AppList(apps = state.apps, contentPadding = innerPadding)
+
+            state.isError -> AppListError(onRetryClick = onRetryClick, modifier = centeredModifier)
+
+            else -> AppList(apps = state.apps, contentPadding = innerPadding)
+        }
+    }
+}
+
+@Composable
+private fun AppListError(onRetryClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(horizontal = 32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.app_list_error),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onRetryClick) {
+            Text(text = stringResource(R.string.app_list_retry))
         }
     }
 }
@@ -225,6 +249,7 @@ private fun AppListScreenPreview() {
             state = AppListState(apps = previewApps, isLoading = false),
             snackbarHostState = remember { SnackbarHostState() },
             onToolbarClick = {},
+            onRetryClick = {},
         )
     }
 }
