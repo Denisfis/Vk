@@ -1,11 +1,11 @@
 package com.example.vk.di
 
-import com.example.vk.data.applist.AppListApi
+import com.example.vk.data.appdetails.AppDetailsRepositoryImpl
 import com.example.vk.data.applist.AppListRepositoryImpl
+import com.example.vk.domain.appdetails.AppDetailsRepository
 import com.example.vk.domain.applist.AppListRepository
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -19,10 +19,7 @@ interface AppModule {
     @Singleton
     fun bindAppListRepository(impl: AppListRepositoryImpl): AppListRepository
 
-    companion object {
-
-        @Provides
-        @Singleton
-        fun provideAppListApi(): AppListApi = AppListApi()
-    }
+    @Binds
+    @Singleton
+    fun bindAppDetailsRepository(impl: AppDetailsRepositoryImpl): AppDetailsRepository
 }

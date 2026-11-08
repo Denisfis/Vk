@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.vk.domain.applist.GetAppListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,11 +39,23 @@ class AppListViewModel @Inject constructor(
         viewModelScope.launch { _events.send(AppListEvent.ShowToolbarSnackbar) }
     }
 
+    fun onRetryClick() {
+        loadApps()
+    }
+
     private fun loadApps() {
+        _state.update { it.copy(isLoading = true, isError = false) }
         viewModelScope.launch {
             Log.d(TAG, "Загрузка списка приложений")
-            val apps = getAppList()
-            _state.update { it.copy(apps = apps, isLoading = false) }
+            try {
+                val apps = getAppList()
+                _state.update { it.copy(apps = apps, isLoading = false) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "Не удалось загрузить каталог", e)
+                _state.update { it.copy(isLoading = false, isError = true) }
+            }
         }
     }
 
