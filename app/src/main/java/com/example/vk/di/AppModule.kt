@@ -2,16 +2,27 @@ package com.example.vk.di
 
 import com.example.vk.data.applist.AppListApi
 import com.example.vk.data.applist.AppListRepositoryImpl
-import com.example.vk.data.applist.AppMapper
 import com.example.vk.domain.applist.AppListRepository
-import com.example.vk.domain.applist.GetAppListUseCase
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
-/** Ручное внедрение зависимостей: единственное место, где слои связываются друг с другом. */
-object AppModule {
+@Module
+@InstallIn(SingletonComponent::class)
+interface AppModule {
 
-    private val appListRepository: AppListRepository by lazy {
-        AppListRepositoryImpl(api = AppListApi(), mapper = AppMapper())
+    // Кто запрашивает интерфейс AppListRepository, получает AppListRepositoryImpl
+    @Binds
+    @Singleton
+    fun bindAppListRepository(impl: AppListRepositoryImpl): AppListRepository
+
+    companion object {
+
+        @Provides
+        @Singleton
+        fun provideAppListApi(): AppListApi = AppListApi()
     }
-
-    fun provideGetAppListUseCase(): GetAppListUseCase = GetAppListUseCase(appListRepository)
 }

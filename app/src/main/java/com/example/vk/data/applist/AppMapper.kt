@@ -2,8 +2,9 @@ package com.example.vk.data.applist
 
 import com.example.vk.domain.applist.AppSummary
 import com.example.vk.domain.applist.Category
+import javax.inject.Inject
 
-class AppMapper {
+class AppMapper @Inject constructor() {
 
     fun toDomain(dto: AppDto): AppSummary = AppSummary(
         id = dto.id,
