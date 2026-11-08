@@ -43,7 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.example.vk.R
 import com.example.vk.domain.applist.AppSummary
@@ -53,7 +53,7 @@ import com.example.vk.presentation.theme.VKTheme
 @Composable
 fun AppListScreen(
     modifier: Modifier = Modifier,
-    viewModel: AppListViewModel = viewModel(factory = AppListViewModel.Factory),
+    viewModel: AppListViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
